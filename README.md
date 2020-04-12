@@ -1,8 +1,15 @@
 # mastran
 matlab/octave toolset for msc nastran bdf manipulation
 
-- Predominantly exists to formalize things like regular expressions and data structure formats
+## Goal
+* Create simple subfunctions for commonly performed tasks involving nastran bdf processing and manipulation.
 
-- In stark contrast to PyNastran, this aims to be almost exclusively a command line based tool.
-Highlights of this toolset are vectorized bdf reading and writing script fragments, as well as
-elementary tools for bdf modification, assembly, and visualization.
+## Style Guide
+* Avoid line by line bdf reading if possible
+* Utilize the core parent data structures
+    * E2N: Element ID To Node ID Map
+    * E2P: Element ID to Property ID Map
+    * E2T: Element ID to Element Type Map
+    * Nodes: [NID, X Coord, Y Coord, Z Coord]
+* Globally support all three nastran card styles, Short, Long, and comma delimited
+* Implement global interrupting error reporting at all subfunction layers

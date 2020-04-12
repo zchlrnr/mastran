@@ -1,13 +1,12 @@
 function fixed_number = degenerate_negative(char_in)
-    %
-    %------------------------------------------------------------------%
-    %                     Theory Of Operations                         %
-    %------------------------------------------------------------------%
-    % Take in character array that must be a number
-    % Strips away all whitespace from start and end with strtrim
-    % replaces all '-' characters with 'E' if they aren't in position 1
-    % ditto for '+' characters.
-    % will break if raised to a power of ten in the hundreds place
+%------------------------------------------------------------------%
+%                     Theory Of Operations                         %
+%------------------------------------------------------------------%
+% Take in character array that must be a number
+% Strips away all whitespace from start and end with strtrim
+% replaces all '-' characters with 'E' if they aren't in position 1
+% ditto for '+' characters.
+% will break if raised to a power of ten in the hundreds place
 
     char_in = strtrim(char_in);
     L = length(char_in);
