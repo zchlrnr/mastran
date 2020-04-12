@@ -3,8 +3,8 @@ function [remaining_bdf,gridpoints] = gridpoint_extractor(bdf)
 %                     Theory Of Operations                         %
 %------------------------------------------------------------------%
 % yoinks the GRID cards from the nastran deck. Leaves the rest alone
-% I've outdone myself. This takes either the filename 
-% or the character matrix while processing input
+% Does not yet support grids in custom coordinate systems
+
     if size(bdf,1)==1 && exist(bdf,'file')==2
         fid=fopen(bdf);
         bdf=textscan(fid,'%s','Delimiter','\n');
