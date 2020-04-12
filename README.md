@@ -13,3 +13,6 @@ matlab/octave toolset for msc nastran bdf manipulation
     * Nodes: [NID, X Coord, Y Coord, Z Coord]
 * Globally support all three nastran card styles, Short, Long, and comma delimited
 * Implement global interrupting error reporting at all subfunction layers
+* High level functions ought strive for pseudo-orthogonal argument parsing. This includes such features as
+    * bdf interchangeability; wherein one can pass either a character array of the bdf, or the bdf as a structure, or the filename of the bdf
+    * loop escape features; wherein a preference exists for while loops over foor loops to support incomplete or segmented file searches over specific ranges or for specific quantities
