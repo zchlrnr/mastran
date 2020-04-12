@@ -27,7 +27,6 @@ function [remaining_bdf,gridpoints] = gridpoint_extractor(bdf)
                 gridpoints(i,:)=[NID,x,y,z];
             end
         elseif strcmpi('GRID ',current_line(1:5))==1
-            pause(1)
             NID = str2double(current_line(9:16));
             x = (degenerate_negative(current_line(25:32)));
             y = (degenerate_negative(current_line(33:40)));
