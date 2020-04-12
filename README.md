@@ -20,6 +20,7 @@ matlab/octave toolset for msc nastran bdf manipulation
 
 ## Features [w/ Addition Date]
 * [2020.04.11] degenerate_negative.m
+
         * takes in a single line character string and turns it from reduced
         format nastran format to a readable format. Despite its name, it actually
         deals with all degenerate number forms, not just negatives.
