@@ -16,6 +16,7 @@ matlab/octave toolset for msc nastran bdf manipulation
 * High level functions ought strive for pseudo-orthogonal argument parsing. This includes such features as
     * bdf interchangeability; wherein one can pass either a character array of the bdf, or the bdf as a structure, or the filename of the bdf
     * loop escape features; wherein a preference exists for while loops over for loops to support incomplete or segmented file searches over specific ranges or for specific quantities
+* Practice non-destructive filtering operations. i.e, if the goal is to subtract all instances of MAT1 cards, pass into a function the bdf, and get out the bdf with the mat1 cards, and the mat1 card data themselves. Never pass data into a function that will not pass back all the neccesary information to reconstruct the original state of the data.
 
 ## Features [w/ Addition Date]
 * [2020.04.11] degenerate_negative.m
