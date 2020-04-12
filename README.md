@@ -20,6 +20,11 @@ matlab/octave toolset for msc nastran bdf manipulation
 
 ## Features [w/ Addition Date]
 * [2020.04.11] degenerate_negative.m
+    * `fixed_number = degenerate_negative(character_string_in)`
     * takes in a single line character string and turns it from reduced
     format nastran format to a readable format. Despite its name, it actually
     deals with all degenerate number forms, not just negatives.
+* [2020.04.11] gridpoint_extractor.m
+    * `[remaining_bdf, gridpoints] = gridpoint_extractor(bdf)`
+    * Takes in either a bdf filename or a character array of the bdf and extracts the gridpoints variable as [Node ID, x coordinate, y coordinate, z coordinate];
+    * Outputs all lines of the bdf that are not gridpoints back into the array "remaining_bdf"

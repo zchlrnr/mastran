@@ -11,12 +11,11 @@ function fixed_number = degenerate_negative(char_in)
     char_in = strtrim(char_in);
     L = length(char_in);
 
-
     % Repairing negatives
-    if L > 1 && strcmp(char_in(L-1),'-',1)==1
+    if L > 1 && strcmpi(char_in(L-1),'-')==1
         fixed_number = str2double(strcat(num2str(...
             char_in(1:(L-2))),'E',num2str(char_in((L-1):L))));
-    elseif L > 2 && strcmp(char_in(L-2),'-',1)==1
+    elseif L > 2 && strcmpi(char_in(L-2),'-')==1
         fixed_number = str2double(strcat(num2str(...
             char_in(1:(L-3))),'E',num2str(char_in((L-2):L))));
     else
@@ -24,10 +23,10 @@ function fixed_number = degenerate_negative(char_in)
     end
 
     % Repairing positives
-    if L > 1 && strcmp(char_in(L-1),'+',1)==1
+    if L > 1 && strcmpi(char_in(L-1),'+')==1
         fixed_number = str2double(strcat(num2str(...
             char_in(1:(L-2))),'E',num2str(char_in((L-1):L))));
-    elseif L > 2 && strcmp(char_in(L-2),'+',1)==1
+    elseif L > 2 && strcmpi(char_in(L-2),'+')==1
         fixed_number = str2double(strcat(num2str(...
             char_in(1:(L-3))),'E',num2str(char_in((L-2):L))));
     else
