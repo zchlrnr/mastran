@@ -20,6 +20,39 @@ matlab/octave toolset for msc nastran bdf manipulation
 
 ## Features [w/ Addition Date]
 * [2020.05.30] nodal_octtree.m
+    * `nearest_node_list = nodal_octtree(varargin)`
+    * Takes in two lists of nodal data and the number of subdivisions the
+      pointcloud will be split into in each axis.
+    * Basically it's "For every node in list 1, find me its nearest node in list
+      2!"
+    * Returns a 2 column list of nodes in list 1 along with its corresponding
+      nearest node in list 2. If the node in list 1 is too far away from any
+      node in list 2, then it won't get a mapping.
+    * If run with divisions=2, then performance is identical or slightly worse
+      than directly computing distance from every node in list 1, to every node
+      in list 2.
+    * To give an approximate idea of performance, when run with 9000 nodes in
+      list 1, and 35000 nodes in list 1; see below (with a "correct" number of
+      connections being around 3000). It can be seen that runtime is N^2 or
+      worse at 2 divisons, and that it plateaus as the divisions begin to go
+      high enough to create erroneous answers. This is a good thing.
+
+    | Divisions |   Runtime | Connections Made|
+    |:----------|:---------:|----------------:|
+    |     2     |  too long |  All of them    |
+    |     5     |~30 minutes|too many of them |
+    |    15     |64 seconds |      4082       |
+    |    20     |36 seconds |      3850       |
+    |    25     |26 seconds |      3392       |
+    |    30     |22 seconds |      3320       |
+    |    60     |16 seconds |      3200       |
+    |   100     |15 seconds |      2909       |
+    |   150     |13 seconds |      1694       |
+    |   200     |13 seconds |       968       |
+    |   300     |13 seconds |       288       |
+    |   500     |13 seconds |       74        |
+
+
 * [2020.04.11] degenerate_negative.m
     * `fixed_number = degenerate_negative(character_string_in)`
     * takes in a single line character string and turns it from reduced

@@ -1,19 +1,19 @@
 function nearest_node_list = nodal_octtree(varargin)
 %   This function takes in two lists of nodes and, for each node in list 1,
 %   finds the single nearest node in list 2. If two nodes are very far apart, it won't find them.
-%   User input will take the form [NodeList1, NodeList2, number of spatial divisions in each axis]
-%   Where each node list is of the form [NID, x coordinate, y coordinate, z coordinate];
+%   User input will take the form [NodeList1, NodeList2, number of spatial divisions in each axis] %   Where each node list is of the form [NID, x coordinate, y coordinate, z coordinate]; tic
+tic
     if nargin != 0
         NL1 = varargin{1};
         NL2 = varargin{2};
         divisor = varargin{3};
     else 
         % faking user input for development {{{
-        N1 = 9000;  % number of nodes in list 1
+        N1 = 18000;  % number of nodes in list 1
         N2 = 35000; % number of nodes in list 2
         
-        divisor = 20; % number of times a single dimension will be divided
-        % MUST ALWAYS BE LARGER THAN 3! OUGHT ALWAYS BE LARGER THAN 5!
+        divisor = 80; % number of times a single dimension will be divided
+        % MUST ALWAYS BE LARGER THAN 2! OUGHT ALWAYS BE LARGER THAN 5!
 
         % creating node IDs and coordinates of the nodes.
         NL1{1} = 1000000+[1:1:N1]'; % if NID starts with 1, it's in group 1
@@ -82,7 +82,6 @@ function nearest_node_list = nodal_octtree(varargin)
         voxelmap(i,3) = min(find(ymax>=y)); % y voxel coordinate
         voxelmap(i,4) = min(find(zmax>=z)); % z voxel coordinate
     end
-    format long g
 
     % now have global octree
     % for each node in list 1, 
@@ -158,6 +157,10 @@ function nearest_node_list = nodal_octtree(varargin)
             ClosestNodeInNL2 = distances(distances(:,2)==min(distances(:,2)),1);
             nearest_node_list(i,2) = ClosestNodeInNL2;
         end
+        if mod(i,20)==0
+            round(i/size(NL1,1)*100)
+        end
     end % }}}
     nearest_node_list = nearest_node_list(nearest_node_list(:,2)!=0,:);
+toc
 end
