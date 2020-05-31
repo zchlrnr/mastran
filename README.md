@@ -19,6 +19,7 @@ matlab/octave toolset for msc nastran bdf manipulation
 * Practice non-destructive filtering operations. i.e, if the goal is to subtract all instances of MAT1 cards, pass into a function the bdf, and get out the bdf with the mat1 cards, and the mat1 card data themselves. Never pass data into a function that will not pass back all the neccesary information to reconstruct the original state of the data.
 
 ## Features [w/ Addition Date]
+* [2020.05.30] nodal_octtree.m
 * [2020.04.11] degenerate_negative.m
     * `fixed_number = degenerate_negative(character_string_in)`
     * takes in a single line character string and turns it from reduced
