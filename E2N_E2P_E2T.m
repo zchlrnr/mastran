@@ -87,6 +87,21 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
 
 %% Creating E2N % {{{
     % Recall that the Types.names structure is defined as
+    % Types.names = {'CROD';'CBAR';'CBEAM';'CTRIA3';'CQUAD4';'CTRIA6';...
+    %       'CQUAD8';'CQUADR';'CTRIAR';'CSHEAR';'CHEXA';'CPENTA';...
+    %       'CTETRA';'CBUSH'};
+    % List of how many lines each element type could possible have
+    % NOTE: manually created continuation lines WILL NOT BE TOLERATED!!!
+    Types.shortlines = [1;2;3;2;2;2;3;2;2;1;3;3;2;2]; 
+    for i = 1:size(Types.names,1)
+        type_name = Types.names{i};
+        fprintf('Looking for %s elements\n',type_name)
+        % logical vector of length size(remaining_bdf,1) if a given line contains "type_name"
+        logicals = (~cellfun(@isempty,cellfun(@(x) regexpi(x,type_name),cellstr(remaining_bdf),'un',0)));
+        % Excempting commented lines from logical array
+        iscomment = (~cellfun(@isempty,cellfun(@(x) regexpi(x,'^\s{0,}\$'),cellstr(remaining_bdf),'un',0)));
+        logicals = and(logicals,not(iscomment));
+        cellfun(@(x) strread(x,'%8s'),cellstr(remaining_bdf),'un',0)
+    end
 % }}}
-
 end

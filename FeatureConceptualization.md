@@ -58,6 +58,6 @@ DESCRIPTION: Allow the equivolencing of nodes in individual bdfs
 Transformation Tool
 -------------------
 DESCRIPTION: Enable movement of bdfs
-* Support transformations and 
+* Support transformations and rotations.
 * What preliminary features do I want to add?
     - Transformation tools (translate and rotate)
