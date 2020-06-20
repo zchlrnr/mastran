@@ -7,7 +7,7 @@ matlab/octave toolset for msc nastran bdf manipulation
 ## Style Guide
 * Avoid line by line bdf reading if possible
 * Utilize the core parent data structures
-    * E2N: Element ID To Node ID Map
+    * E2N: Element ID to Node ID Map
     * E2P: Element ID to Property ID Map
     * E2T: Element ID to Element Type Map
     * Nodes: [NID, X Coord, Y Coord, Z Coord]
@@ -19,6 +19,11 @@ matlab/octave toolset for msc nastran bdf manipulation
 * Practice non-destructive filtering operations. i.e, if the goal is to subtract all instances of MAT1 cards, pass into a function the bdf, and get out the bdf with the mat1 cards, and the mat1 card data themselves. Never pass data into a function that will not pass back all the neccesary information to reconstruct the original state of the data.
 
 ## Features [w/ Addition Date]
+* [2020.06.19] FeatureConceptualization.m
+    * It is the goal of this document to act as a conceptual mockup space and
+      brainstorming stack for features I want to add, and the methods I would go
+      about to add them.
+
 * [2020.05.30] nodal_octtree.m
     * `nearest_node_list = nodal_octtree(varargin)`
     * Takes in two lists of nodal data and the number of subdivisions the
