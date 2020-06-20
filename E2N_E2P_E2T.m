@@ -64,6 +64,7 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
             longform_matches = pertinant_lines(~cellfun(@isempty,cellfun(@(x) regexpi(x,[type_name,'\*']), ...
                 cellstr(pertinant_lines),'un',0)),:);
 
+            % Populating E2T and E2P matrices 
             if ~isempty(space_matches)
                 E2T = [E2T;str2double(space_matches(:,9:16)),ones(size(str2double(space_matches(:,9:16))))*i];
                 E2P = [E2P;str2double(space_matches(:,9:16)),str2double(space_matches(:,17:24))];
