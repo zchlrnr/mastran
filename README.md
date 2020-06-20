@@ -19,7 +19,7 @@ matlab/octave toolset for msc nastran bdf manipulation
 * Practice non-destructive filtering operations. i.e, if the goal is to subtract all instances of MAT1 cards, pass into a function the bdf, and get out the bdf with the mat1 cards, and the mat1 card data themselves. Never pass data into a function that will not pass back all the neccesary information to reconstruct the original state of the data.
 
 ## Features [w/ Addition Date]
-* [2020.06.19] FeatureConceptualization.m
+* [2020.06.19] FeatureConceptualization.md
     * It is the goal of this document to act as a conceptual mockup space and
       brainstorming stack for features I want to add, and the methods I would go
       about to add them.
