@@ -84,4 +84,9 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
         % is continuation line if first eight characters are empty
     end
     % }}}
+
+%% Creating E2N % {{{
+    % Recall that the Types.names structure is defined as
+% }}}
+
 end
