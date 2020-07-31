@@ -8,6 +8,7 @@ E2N Feature Completion in E2N_E2P_E2T.m
 ---------------------------------------
 DESCRIPTION: Finish implenting refactored E2N legacy function 
 * Complete simple field matching for all elements in Types.names
+* Bugtest to see if E2N is actually modular.
 
 RBAR Tool
 ---------
@@ -61,3 +62,9 @@ DESCRIPTION: Enable movement of bdfs
 * Support transformations and rotations.
 * What preliminary features do I want to add?
     - Transformation tools (translate and rotate)
+    
+Plotter/3D Visualizer
+---------------------
+DESCRIPTION: Enable plotting of elements and nodes in matlabs 3d plotter
+* Enable visualization of nodes, elements, and MPCs
+* Enable visualizatioin of loads and boundary conditions
