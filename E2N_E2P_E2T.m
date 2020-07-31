@@ -46,7 +46,6 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
         % Excempting commented lines from logical array
         iscomment = (~cellfun(@isempty,cellfun(@(x) regexpi(x,'^\s{0,}\$'),cellstr(remaining_bdf),'un',0)));
         logicals = and(logicals,not(iscomment));
-
         % if logicals is empty, there's none of that element type in the bdf
         if sum(logicals) > 0
             fprintf('%s discovered in model %s times\n',type_name,num2str(sum(logicals)))
@@ -86,13 +85,8 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
     % }}}
 
 %% Creating E2N % {{{
-    % Recall that the Types.names structure is defined as
-    % Types.names = {'CROD';'CBAR';'CBEAM';'CTRIA3';'CQUAD4';'CTRIA6';...
-    %       'CQUAD8';'CQUADR';'CTRIAR';'CSHEAR';'CHEXA';'CPENTA';...
-    %       'CTETRA';'CBUSH'};
-    % List of how many lines each element type could possible have
-    % NOTE: manually created continuation lines WILL NOT BE TOLERATED!!!
-    Types.shortlines = [1;2;3;2;2;2;3;2;2;1;3;3;2;2]; 
+    % Pre-allocating E2N. No element has more than 20 nodes.
+    E2N = zeros(size(remaining_bdf,1),20);
     for i = 1:size(Types.names,1)
         type_name = Types.names{i};
         fprintf('Looking for %s elements\n',type_name)
@@ -101,7 +95,58 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
         % Excempting commented lines from logical array
         iscomment = (~cellfun(@isempty,cellfun(@(x) regexpi(x,'^\s{0,}\$'),cellstr(remaining_bdf),'un',0)));
         logicals = and(logicals,not(iscomment));
-        cellfun(@(x) strread(x,'%8s'),cellstr(remaining_bdf),'un',0)
+        pertinant_lines = remaining_bdf(logicals,:);
+        % The Nastran allowable syntax for bulk data entries is a clusterfuck
+        for j = 1:size(pertinant_lines,1)
+            % catch every type of continuation
+            % Read Format of Bulk Data Entries in the MSC Nastran QRG
+            % Conditional logic of the three format types. {{{
+            %     - Free Field Format Rules
+            %         * Data starts on column 1
+            %         * Commas in succession skip fields
+            %     - Small Field Format Rules
+            %         * Data starts on column 1
+            %     - Large Field Format Rules
+            %         * Denoted by asterisk immediately after first string in field 1A
+            % Rules of continuation lines 
+            %     - If there's a + in field 10, theres a continuation line
+            %     - If there's a * in field 1, there's a continuation line
+            %     - If there's a * in field 1, there must be a * in column 1 of field 1B (on the next line)
+            %     - If field 10 AND field 1 are empty and if the continuation line is non blank, its real.
+            % }}}
+            % Reading contents of matching line
+            cl = pertinant_lines(j,:); % current line
+            fields = getfields(cl); % fields in current line
+            % Determine how many continuation lines are needed
+            % if field 1 matches '^\w+\*' 
+            % OR
+            % if "field 10 is empty" && "field 1b is ( \s{8} | "*" | "+" )" && 
+            %     "fields 11-20 contain any non whitespace"
+            N_continuations = 0;
+            escape = 0;
+            while escape == 0
+                % does current line contain asterisk, implying continuation?
+                asterisk_flag = logical(~isempty(regexpi(num2str(fields{1}),'^\w+\*','once')));
+                % is field 10 empty?
+                if ceil(length(cl)/8)<10 
+                    f_10_empty = 1;
+                elseif ceil(length(deblank(cl))/8)<10
+                    f_10_empty = 1;
+                end
+                % is next line a candidate?
+                if j + N_continuations < size(remaining_bdf,1)
+                end
+                escape=1;
+            end
+        end
     end
 % }}}
 end
+function fields = getfields(cl) % {{{
+    % This subfunction gets a line and splits it into eight character fields
+    cl = length(deblank(cl));
+    number_of_fields = ceil(length(cl)/8);
+    for i = 1:number_of_fields
+        fields{i} = cl(i*8-7:min(i*8,length(cl)));
+    end
+end % }}}
