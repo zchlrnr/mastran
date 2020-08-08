@@ -8,6 +8,7 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
 %                         Dependants                               %
 %------------------------------------------------------------------%
 %  *  gridpoint_extractor.m                                        %
+%  *  degenerate_negative.m                                        %
 %% Reading In File % {{{
     fprintf('Entered E2N_E2P_E2T\n')
     % if bdf is as a filename, finding it and importing it
@@ -20,6 +21,7 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
     end % }}}
 
 %% Reading in data to Nodes  % {{{
+    fprintf('\n Reading in data to Nodes\n')
     [remaining_bdf,Nodes] = gridpoint_extractor(bdf);
     % }}}
 
@@ -39,7 +41,7 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
     E2P = [];
     for i = 1:size(Types.names,1)
         type_name = Types.names{i};
-        fprintf('Looking for %s\n',type_name)
+        fprintf('Looking for %s Element\n',type_name)
         % logical vector of length size(remaining_bdf,1) if a given line contains "type_name"
         logicals = (~cellfun(@isempty,cellfun(@(x) regexpi(x,type_name),cellstr(remaining_bdf),'un',0)));
         % Excempting commented lines from logical array
@@ -86,19 +88,18 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
 %% Creating E2N % {{{
     % Pre-allocating E2N. No element has more than 20 nodes.
     E2N = zeros(size(remaining_bdf,1),20);
+    % getting length of each line in order to check for continuation criteria
+    length_of_each_line = vertcat(cellfun(@size,cellstr(remaining_bdf),'un',0));
+    length_of_each_line = vertcat(length_of_each_line{:});
+    length_of_each_line = length_of_each_line(:,2);
     for i = 1:size(Types.names,1)
         type_name = Types.names{i};
-        fprintf('Looking for %s elements\n',type_name)
+        fprintf('Looking for %s Elements\n',type_name)
         % logical vector of length size(remaining_bdf,1) if a given line contains "type_name"
-        logicals = (~cellfun(@isempty,cellfun(@(x) regexpi(x,type_name),cellstr(remaining_bdf),'un',0)));
-        % Excempting commented lines from logical array
-        iscomment = (~cellfun(@isempty,cellfun(@(x) regexpi(x,'^\s{0,}\$'),cellstr(remaining_bdf),'un',0)));
-        logicals = and(logicals,not(iscomment));
+        logicals = (~cellfun(@isempty,cellfun(@(x) regexpi(x,['^',type_name]),...
+            cellstr(remaining_bdf),'un',0)));
         pertinant_lines = remaining_bdf(logicals,:);
-        % The Nastran allowable syntax for bulk data entries is a clusterfuck
-        for j = 1:size(pertinant_lines,1)
-            % catch every type of continuation
-            % Read Format of Bulk Data Entries in the MSC Nastran QRG
+        % Let's start off by trying to do it fully vectorized
             % Conditional logic of the three format types. {{{
             %     - Free Field Format Rules
             %         * Data starts on column 1
@@ -113,39 +114,54 @@ function [E2N,E2P,E2T,remaining_bdf] = E2N_E2P_E2T(bdf)
             %     - If there's a * in field 1, there must be a * in column 1 of field 1B (on the next line)
             %     - If field 10 AND field 1 are empty and if the continuation line is non blank, its real.
             % }}}
-            % Reading contents of matching line
-            cl = pertinant_lines(j,:); % current line
-            fields = getfields(cl); % fields in current line
-            % Determine how many continuation lines are needed
-            % if field 1 matches '^\w+\*' 
-            % OR
-            % if "field 10 is empty" && "field 1b is ( \s{8} | "*" | "+" )" && 
-            %     "fields 11-20 contain any non whitespace"
-            N_continuations = 0;
-            escape = 0;
-            while escape == 0
-                % does current line contain asterisk, implying continuation?
-                asterisk_flag = logical(~isempty(regexpi(num2str(fields{1}),'^\w+\*','once')));
-                % is field 10 empty?
-                if ceil(length(cl)/8)<10 
-                    f_10_empty = 1;
-                elseif ceil(length(deblank(cl))/8)<10
-                    f_10_empty = 1;
+        % METHOD IDEA!!
+        %{
+        - For each match, store its line number in matrix 'a' as the first column
+            (a(:,1)=find(logicals)
+        - in the second column, store the logicals + the number of lines forward we must check
+            (a(:,2)=a(:,1)+2*Types.shortlines(i))
+        - Work from there
+        %}
+
+        % continuation_ranges is a two column array of where a match is, followed by the line where
+        % the longest possible matching line would stop.
+        continuation_ranges = [find(logicals),find(logicals)+Types.shortlines(i)];
+        % prototype with loop
+        % make a column vector where the values are 0,1, or 2 where
+        %   - 0 == useless get rid of it
+        %   - 1 == original line
+        %   - 2 == relevant continuation line
+        % day is 2020.08.08
+        % have the idea to just try a loop again because I found out how to read a fixed width line
+        % automatically. it's cl = [cl,repmat(' ',1,8-mod(size(cl,2),8))]; cl=reshape(cl,8,[]);
+        % start off with vector of '1's where I have element tags I know I need
+        action_vector = double(logicals);
+        for j = 1:size(continuation_ranges,1)
+            line_start = continuation_ranges(j,1);
+            line_end = continuation_ranges(j,2);
+            % catch end of file exception
+            line_end = min(line_end,size(remaining_bdf,1));
+            for k = line_start:line_end
+                cl = remaining_bdf(k,:);
+                if size(cl,2)==0
+                    action_vector(k)=0;
+                elseif logical(strcmpi(cl(1),'*'))
+                    action_vector(k)=2;
+                elseif strcmpi(cl(1),'+')
+                    action_vector(k)=2;
+                elseif strcmpi(cl(1),'$')
+                    action_vector(k)=0;
                 end
-                % is next line a candidate?
-                if j + N_continuations < size(remaining_bdf,1)
-                end
-                escape=1;
             end
         end
+        % now have action_vector which is logicals with extra data
+        if not(isempty(action_vector))
+            lines_to_check = [find(~action_vector==0),action_vector(find(~action_vector==0))];
+        end
+        % will check each line_to_check and then rip pertinant data from it
     end
-% }}}
+
+    cd ..
+    save workstack
+    cd mastran
 end
-function fields = getfields(cl) % {{{
-    % This subfunction gets a line and splits it into eight character fields
-    cl = length(deblank(cl));
-    number_of_fields = ceil(length(cl)/8);
-    for i = 1:number_of_fields
-        fields{i} = cl(i*8-7:min(i*8,length(cl)));
-    end
-end % }}}
